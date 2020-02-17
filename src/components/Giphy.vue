@@ -25,11 +25,14 @@
 </template>
 
 <script>
-export default {
+const axios = require('axios');
+export default {  
   name: "Giphy",
   data: () => ({
     message : "Hey you",
     isButtonDisabled: true,
+    gifsGiphy : [],
+    
     Gifs: [
       {
         src: "giphy.webp"
@@ -55,6 +58,15 @@ export default {
       return this.message.split('').reverse().join('')
     }
   }
-};
+  ,
+  mounted :{
+    axios: axios.get("http://api.giphy.com/v1/gifs/trending?api_key=NUyEXSEp3eCathE3E7ZLDyFbWE0Uf1nL").then(response => {
+            this.gifs = response.data.data;
+        }),
+    updated(){
+        console.log("updated");
+  }
+}
+}
 </script>
 
