@@ -1,10 +1,9 @@
 
 <template>
-
   <v-app>
     <v-app-bar
       app
-      color="blue"
+      color="green"
       dark
     >
       <div class="d-flex align-center">
@@ -31,7 +30,7 @@
     </v-app-bar>
 
     <v-content>
-      <Giphy/>
+      <HelloWorld/>
     </v-content>
   </v-app>
 </template>
@@ -40,7 +39,7 @@
 import Giphy from './components/Giphy';
 
 export default {
-  name: 'App',
+  name: 'Home',
 
   components: {
     Giphy,
