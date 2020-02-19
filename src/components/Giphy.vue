@@ -54,7 +54,7 @@
           <v-card-title class="headline">Taí o link babyShark</v-card-title>
   
           <v-card-text>
-         
+          {{gifsGiphy.images}}
           </v-card-text>
   
           <v-card-actions>
