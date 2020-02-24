@@ -6,72 +6,58 @@
         <v-text-field
           v-model="search"
           :label="search"
-          @keydown="getSearchedGifs"
+          @keydown="getGifsFromGiphy"
           append-icon="search"
           Buscar
         ></v-text-field>
+      <v-btn @click.stop="clearSearch()" >
+        <v-icon>mdi-close</v-icon>
+        Clear Search 
+      </v-btn>  
       </v-col>
-      <!-- <p>Mensagem ao contrário: "{{ gifsGiphy[1].images }}"</p> -->
     </v-row>
 
     <v-container fluid>
       <v-row dense>
 
         <!-- v-for interates in Gifs, defined inside data
-
         :cols="Math.ceil((next.images.fixed_height_small.width/100)+2)"-->
-        <v-col
-            v-for="(next,i) in gifsGiphy"
-            :key="i"
-            :cols =4
-          >
-        <v-card 
-        :elevation=15 >
-          <v-img
-            class="white--text align-end"
-            gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-            :height="270"
-            v-cloak
-            :src="next.images.fixed_height_small.webp "
-            alt
-          />
-           <v-card-actions>
-                <v-btn @click.stop="dialog = true" icon>
-                  <v-icon>mdi-share-variant</v-icon>
-                </v-btn>
-              </v-card-actions>
-        </v-card>
-        </v-col>
-        
 
-        
+        <v-col v-for="(next,i) in gifsGiphy" :key="i" :cols="4">
+          <v-card :elevation="15">
+            <v-img
+              class="white--text align-end"
+              gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+              :height="270"
+              v-cloak
+              :src="next.images.fixed_height_small.webp "
+              alt
+            />
+            <v-card-actions>
+              <v-btn @click.stop="showGifLink(i)" icon>
+                <v-icon>mdi-share-variant</v-icon>
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
       </v-row>
-      <v-dialog
-        v-model="dialog"
-        max-width="290"
-      >
-        <v-card >
+
+      <v-dialog v-model="dialog" max-width="290">
+        <v-card>
           <v-card-title class="headline">Taí o link babyShark</v-card-title>
-  
-          <v-card-text>
-          {{gifsGiphy.images}}
-          </v-card-text>
-  
+
+          <v-card-text>{{gifLink}}</v-card-text>
+
           <v-card-actions>
             <v-spacer></v-spacer>
 
-            <v-btn
-              color="green darken-1"
-              text
-              @click="dialog = false"
-            >
-              Copiar
-            </v-btn>
+            <v-btn color="green darken-1" text @click="dialog = false">Copiar</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
-       
+
     </v-container>
+
     <scroll-loader :loader-method="getGifsFromGiphy" :loader-disable="disableLoad"></scroll-loader>
   </v-container>
 </template>
@@ -83,31 +69,38 @@ export default {
   name: "Giphy",
   data: () => ({
     search: "",
-    isButtonDisabled: true,
     gifsGiphy: [],
     disableLoad: false,
     indexGifsGiphy: 0,
-    isTrendingOrSearch: null,
-    dialog: false
+    dialog: false,
+    gifLink: "",
+    timeout: null
+    
   }),
 
-  computed: {
-    // uma função "getter" computada (computed getter)
-    reversedMessage: function() {
-      // `this` aponta para a instância Vue da variável `vm`
-      return this.message
-        .split("")
-        .reverse()
-        .join("");
-    }
-  },
+  computed: {},
+
   mounted() {
     // let self = this; used to acess variable from global scope localy
   },
 
   methods: {
+
+    showGifLink(i){
+        this.dialog = true;
+        this.gifLink = this.gifsGiphy[i].url;
+        console.log("show after update",this.gifLink);
+    },
+
+    clearSearch(){
+      this.gifsGiphy = [];
+      this.indexGifsGiphy = 0;
+      this.search = "";
+      this.getGifsFromGiphy();
+    },
+
     getGifsFromGiphy() {
-      console.log("CHEGUEI AQUI");
+      if(this.search == ""){
       axios
         .get(
           "http://api.giphy.com/v1/gifs/trending?api_key=NUyEXSEp3eCathE3E7ZLDyFbWE0Uf1nL&offset=" +
@@ -119,16 +112,15 @@ export default {
           this.indexGifsGiphy += 25;
           console.log("coe", this.gifsGiphy);
         });
+      }      
+      else{
+        this.getSearchedGifs();
+      }
     },
 
-    getSearchedGifs() {
-      //this.disableLoad = true;
-      if (this.search == "") {
-        this.disableLoad = false;
-        this.gifsGiphy = [];
-        this.getGifsFromGiphy();
-      } else {
-        this.disableLoad = true;
+    getSearchedGifs() {   
+       clearTimeout(this.timeout);
+        this.timeout = setTimeout(() =>{
         axios
           .get(
             "http://api.giphy.com/v1/gifs/search?api_key=NUyEXSEp3eCathE3E7ZLDyFbWE0Uf1nL&q=" +
@@ -138,13 +130,10 @@ export default {
             this.gifsGiphy = [];
             this.gifsGiphy = [...this.gifsGiphy, ...response.data.data];
           });
-      }
-
-      console.log("search", this.search);
-      console.log("disable", this.disableLoad);
-    },
-
-    checkSearchOrTrending() {}
+          console.log("search", this.search); 
+        },1000);
+     
+    }, 
   }
 };
 </script>
