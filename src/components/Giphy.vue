@@ -46,12 +46,12 @@
         <v-card>
           <v-card-title class="headline">Taí o link babyShark</v-card-title>
 
-          <v-card-text>{{gifLink}}</v-card-text>
+          <v-card-text id="gifLink">{{gifLink}}</v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
 
-            <v-btn color="green darken-1" text @click="dialog = false">Copiar</v-btn>
+            <v-btn color="green darken-1" text @click="dialog = false " v-clipboard:copy="gifLink">Copiar</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -133,7 +133,7 @@ export default {
           console.log("search", this.search); 
         },1000);
      
-    }, 
+    },   
   }
 };
 </script>
